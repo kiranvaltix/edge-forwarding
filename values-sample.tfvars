@@ -20,3 +20,4 @@ vm_key_name      = ""
 
 gw_iam_role_name = ""
 cloud_account_name = ""
+valtix_api_key = ""

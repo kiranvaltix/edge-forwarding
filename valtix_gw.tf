@@ -18,6 +18,7 @@ resource "valtix_gateway" "fwd_gw" {
   vpc_id                  = aws_vpc.vpc.id
   mgmt_security_group     = aws_security_group.mgmt.id
   datapath_security_group = aws_security_group.datapath.id
+  aws_gateway_lb          = true
   dynamic "instance_details" {
     for_each = var.zones
     content {

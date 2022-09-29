@@ -23,20 +23,17 @@ variable "zones" {
     app_cidr      = string
     datapath_cidr = string
     mgmt_cidr     = string
-    nat_cidr      = string
   }))
   default = {
     "us-east-1a" = {
       app_cidr      = ""
       datapath_cidr = "10.0.2.0/24"
       mgmt_cidr     = "10.0.4.0/24"
-      nat_cidr      = ""
     }
     "us-east-1b" = {
       app_cidr      = ""
       datapath_cidr = "10.0.3.0/24"
       mgmt_cidr     = "10.0.5.0/24"
-      nat_cidr      = ""
     }
   }
 }

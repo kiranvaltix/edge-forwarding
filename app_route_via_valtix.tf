@@ -24,5 +24,5 @@ resource "aws_route" "app_default_via_valtix" {
   for_each               = var.zones
   route_table_id         = aws_route_table.app_via_valtix[each.key].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = local.gwlbe_by_zones[each.key]
+  vpc_endpoint_id        = local.gwlbe_by_zones[each.key]
 }

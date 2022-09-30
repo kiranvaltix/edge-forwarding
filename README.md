@@ -1,15 +1,20 @@
-# Prepare existing VPC for AWS by adding Valtix resources
+# Edge VPC with Valtix Gateway in Forwarding Mode
 
 1. Create the following subnets in each of the availability zones:
     * datapath subnet and datapath route table associated to it, default route to igw
     * mgmt subnet and mgmt route table associated to it, default route to igw
+    * app subnet and app route table associated to it, default route via Valtix GWLBE
 1. Create security groups in the VPC
     * datapath: allow all ingress and egress traffic
-    * mgmt: allow all egress traffic
+    * mgmt: allow all egress traffic and port 22 on ingress
+1. Create bastionvm in the mgmt subnet and associate the mgmt security group
+1. Create a route table in each of the availability zones and associate that to the IGW
+1. Add a route to the app subnet via Valtix GWLBE
+1. Create Valtix Egress Gateway, policy rule set and forwarding rule, service without snt
 
 ## Variables
 * `prefix` - Prefix used for all the resources created, defaults to `valtix_svpc`
-* `vpc_id` - VPC Id in which the Valtix resources are created, leave this to empty to create a new VPC
+* `aws_creds_profile` - AWS Credentials (profile name)
 * `vpc_cidr` - If a new VPC needs to be created, then use this CIDR for the VPC
 * `region` - AWS region where Valtix Gateways are deployed
 * `zones` - Availability zones, a map of zone name to cidrs. *Note* If nat_cidr is provided, then public subnets with the defined CIDR are created. NAT Gateways are created in thos public subnets and used as next hop in the datapath and mgmt route tables. If you dont' want NAT GW, make this empty string. If a new VPC is created, then specifying `app_cidr` would also create app subnets and vm instances in those subnets
@@ -26,76 +31,15 @@
       mgmt_cidr     = "10.0.5.0/24"
     }
     ```
+* `vm_key_name` - SSH Key pair name for the VM
+* `valtix_api_key` - Valtix API Key file (json file)
+* `cloud_account_name` - Cloud account name used on the Valtix Dashboard to onboard the AWS Account
+* `gw_iam_role_name` - IAM Role name to assign to the Valtix Gateway Instances
 
-## Outputs
-* `datapath_subnet` - A map for each zone, with subnet names and ids
-    ```
-    datapath_subnet = {
-      "us-east-1a" = {
-        "route_table_id" = "rtb-111111"
-        "route_table_name" = "valtix_svpc_us-east-1a_datapath"
-        "subnet_id" = "subnet-11111"
-        "subnet_name" = "valtix_svpc_us-east-1a_datapath"
-      }
-      "us-east-1b" = {
-        "route_table_id" = "rtb-1111"
-        "route_table_name" = "valtix_svpc_us-east-1b_datapath"
-        "subnet_id" = "subnet-11111"
-        "subnet_name" = "valtix_svpc_us-east-1b_datapath"
-      }
-    }
-    ```
-* `datapath_security_group` - A map of id and name
-    ```
-    {
-      "id" = "sg-1111"
-      "name" = "valtix_svpc_datapath
-    }
-    ```
-* `mgmt_subnet` - A map for each zone, with subnet names and ids
-    ```
-    mgmt_subnet = {
-      "us-east-1a" = {
-        "route_table_id" = "rtb-111111"
-        "route_table_name" = "valtix_svpc_us-east-1a_mgmt"
-        "subnet_id" = "subnet-11111"
-        "subnet_name" = "valtix_svpc_us-east-1a_mgmt"
-      }
-      "us-east-1b" = {
-        "route_table_id" = "rtb-1111"
-        "route_table_name" = "valtix_svpc_us-east-1b_mgmt"
-        "subnet_id" = "subnet-11111"
-        "subnet_name" = "valtix_svpc_us-east-1b_mgmt"
-      }
-    }
-    ```
-* `mgmt_security_group` - A map of id and name
-    ```
-    {
-      "id" = "sg-1111"
-      "name" = "valtix_svpc_mgmt
-    }
-    ```
-* `valtix_gw_instance_details` - A structure suitable to be used as-is in the valtix_gateway terraform resource
-    ```
-    "us-east-1a" = {
-      "availability_zone" = "us-east-1a"
-      "mgmt_subnet" = "subnet-11111"
-      "datapath_subnet" = "subnet-11112"
-    }
-    "us-east-1b" = {
-      "availability_zone" = "us-east-1b"
-      "mgmt_subnet" = "subnet-21111"
-      "datapath_subnet" = "subnet-21112"
-    }
-    ```
-* `vpc_id` - VPC Id that was provided
-* `region` - AWS Region that was provided    
-
-## Run as root module
+## Running
 
 ```
-cp values-sample values
+cp values-sample.tfvars values
 ```
 
 Edit `values` with appropriate values

@@ -9,7 +9,7 @@ resource "valtix_service_object" "tcp_fwd_all" {
 }
 
 resource "valtix_policy_rule_set" "fwd_gw_ruleset" {
-  name = "forwarding-gw"
+  name = "${var.prefix}-gw"
 }
 
 resource "valtix_policy_rules" "fwd_gw_ruleset" {
@@ -23,8 +23,7 @@ resource "valtix_policy_rules" "fwd_gw_ruleset" {
 }
 
 resource "valtix_gateway" "fwd_gw" {
-  name                    = "aws-forwarding-gw"
-  description             = "AWS Forwarding Gateway"
+  name                    = "${var.prefix}-gw"
   csp_account_name        = var.cloud_account_name
   instance_type           = "AWS_M5_LARGE"
   gateway_image           = "release-22.08-01"
@@ -46,5 +45,8 @@ resource "valtix_gateway" "fwd_gw" {
       mgmt_subnet       = aws_subnet.mgmt[instance_details.key].id
       datapath_subnet   = aws_subnet.datapath[instance_details.key].id
     }
+  }
+  tags = {
+    prefix = var.prefix
   }
 }

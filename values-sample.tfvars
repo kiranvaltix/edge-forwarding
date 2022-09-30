@@ -1,7 +1,7 @@
-prefix = "valtix_svpc"
+prefix            = "valtix_svpc"
 aws_creds_profile = "default"
-vpc_cidr = "10.0.0.0/16"
-region = "us-east-1"
+vpc_cidr          = "10.0.0.0/16"
+region            = "us-east-1"
 zones = {
   "us-east-1a" = {
     app_cidr      = "10.0.0.0/24"
@@ -18,6 +18,6 @@ zones = {
 vm_instance_type = "t3a.medium"
 vm_key_name      = ""
 
-gw_iam_role_name = ""
+gw_iam_role_name   = ""
 cloud_account_name = ""
-valtix_api_key = ""
+valtix_api_key     = ""

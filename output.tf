@@ -9,11 +9,13 @@ output "region" {
 output "app_subnet" {
   value = { for zone, dummy in var.zones :
     zone => {
-      cidr             = aws_subnet.app[zone].cidr_block
-      subnet_id        = aws_subnet.app[zone].id
-      subnet_name      = aws_subnet.app[zone].tags.Name
-      route_table_id   = aws_route_table.app[zone].id
-      route_table_name = aws_route_table.app[zone].tags.Name
+      cidr                        = aws_subnet.app[zone].cidr_block
+      subnet_id                   = aws_subnet.app[zone].id
+      subnet_name                 = aws_subnet.app[zone].tags.Name
+      route_table_id_via_igw      = aws_route_table.app_via_igw[zone].id
+      route_table_name_via_igw    = aws_route_table.app_via_igw[zone].tags.Name
+      route_table_id_via_valtix   = aws_route_table.app_via_valtix[zone].id
+      route_table_name_via_valtix = aws_route_table.app_via_valtix[zone].tags.Name
     }
   }
 }

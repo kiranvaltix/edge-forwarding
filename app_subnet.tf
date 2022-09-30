@@ -9,25 +9,3 @@ resource "aws_subnet" "app" {
     prefix = var.prefix
   }
 }
-
-resource "aws_route_table" "app_via_igw" {
-  for_each = var.zones
-  vpc_id   = aws_vpc.vpc.id
-  tags = {
-    Name   = "${var.prefix}-app-via-igw-${each.key}"
-    prefix = var.prefix
-  }
-}
-
-resource "aws_route_table_association" "app_via_igw" {
-  for_each       = var.zones
-  subnet_id      = aws_subnet.app[each.key].id
-  route_table_id = aws_route_table.app_via_igw[each.key].id
-}
-
-resource "aws_route" "app_default_via_igw" {
-  for_each               = var.zones
-  route_table_id         = aws_route_table.app_via_igw[each.key].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw.id
-}

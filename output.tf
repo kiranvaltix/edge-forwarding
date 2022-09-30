@@ -1,5 +1,8 @@
 output "vpc" {
-  value = aws_vpc.vpc.id
+  value = {
+    id   = aws_vpc.vpc.id
+    name = aws_vpc.vpc.tags.Name
+  }
 }
 
 output "region" {
@@ -9,21 +12,19 @@ output "region" {
 output "app_subnet" {
   value = { for zone, dummy in var.zones :
     zone => {
-      cidr                        = aws_subnet.app[zone].cidr_block
-      subnet_id                   = aws_subnet.app[zone].id
-      subnet_name                 = aws_subnet.app[zone].tags.Name
-      route_table_id_via_igw      = aws_route_table.app_via_igw[zone].id
-      route_table_name_via_igw    = aws_route_table.app_via_igw[zone].tags.Name
-      route_table_id_via_valtix   = aws_route_table.app_via_valtix[zone].id
-      route_table_name_via_valtix = aws_route_table.app_via_valtix[zone].tags.Name
+      cidr             = aws_subnet.app[zone].cidr_block
+      subnet_id        = aws_subnet.app[zone].id
+      subnet_name      = aws_subnet.app[zone].tags.Name
+      route_table_id   = aws_route_table.app[zone].id
+      route_table_name = aws_route_table.app[zone].tags.Name
     }
   }
 }
 
 output "app_security_group" {
   value = {
-    id   = one(aws_security_group.app[*].id)
-    name = one(aws_security_group.app[*].name)
+    id   = aws_security_group.app.id
+    name = aws_security_group.app.name
   }
 }
 
@@ -35,6 +36,16 @@ output "app_instances" {
       private_ip = aws_instance.vm[zone].private_ip
       public_ip  = aws_instance.vm[zone].public_ip
     }
+  }
+}
+
+output "bastionvm" {
+  value = {
+    id         = aws_instance.bastionvm.id
+    name       = aws_instance.bastionvm.tags.Name
+    private_ip = aws_instance.bastionvm.private_ip
+    public_ip  = aws_instance.bastionvm.public_ip
+    ssh        = "ssh ubuntu@${aws_instance.bastionvm.public_ip}"
   }
 }
 
@@ -76,13 +87,25 @@ output "mgmt_security_group" {
   }
 }
 
-output "valtix_gw_instance_details" {
-  description = "instance_details in valtix_gateway resource"
-  value = { for zone, dummy in var.zones :
-    zone => {
-      availability_zone = zone
-      mgmt_subnet       = aws_subnet.mgmt[zone].id
-      datapath_subnet   = aws_subnet.datapath[zone].id
+output "valtix_gw" {
+  value = { for inst in valtix_gateway.fwd_gw.instance_details :
+    inst.availability_zone => {
+      datapath_private_ip = inst.datapath_private_ip
+      datapath_public_ip  = inst.datapath_public_ip
+      mgmt_private_ip     = inst.mgmt_private_ip
+      mgmt_public_ip      = inst.mgmt_public_ip
+      gwlbe               = local.gwlbe_by_zones[inst.availability_zone]
     }
+  }
+}
+
+output "z_console_urls" {
+  value = {
+    instances       = "https://console.aws.amazon.com/ec2/home?#Instances:tag:prefix=${var.prefix};sort=tag:Name"
+    route_tables    = "https://console.aws.amazon.com/vpc/home?#RouteTables:tag:prefix=${var.prefix};sort=tag:Name"
+    security_groups = "https://console.aws.amazon.com/ec2/home?#SecurityGroups:tag:prefix=${var.prefix};sort=tag:Name"
+    subnets         = "https://console.aws.amazon.com/vpc/home?#subnets:tag:prefix=${var.prefix};sort=tag:Name"
+    subnets         = "https://console.aws.amazon.com/vpc/home?#subnets:tag:prefix=${var.prefix};sort=tag:Name"
+    vpc             = "https://console.aws.amazon.com/vpc/home?#vpcs:tag:prefix=${var.prefix};sort=tag:Name"
   }
 }

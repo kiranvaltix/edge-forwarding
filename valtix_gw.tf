@@ -1,5 +1,25 @@
+resource "valtix_service_object" "tcp_fwd_all" {
+  name         = "${var.prefix}-tcp-fwd-all-nosnat"
+  service_type = "Forwarding"
+  protocol     = "TCP"
+  source_nat   = false
+  port {
+    destination_ports = "1-65535"
+  }
+}
+
 resource "valtix_policy_rule_set" "fwd_gw_ruleset" {
   name = "forwarding-gw"
+}
+
+resource "valtix_policy_rules" "fwd_gw_ruleset" {
+  rule_set_id = valtix_policy_rule_set.fwd_gw_ruleset.rule_set_id
+  rule {
+    name    = "tcp-all-fwd"
+    action  = "Allow Log"
+    service = valtix_service_object.tcp_fwd_all.service_id
+    type    = "Forwarding"
+  }
 }
 
 resource "valtix_gateway" "fwd_gw" {

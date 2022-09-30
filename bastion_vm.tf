@@ -5,7 +5,7 @@ locals {
 resource "aws_instance" "bastionvm" {
   ami                         = data.aws_ami.ubuntu.id
   availability_zone           = local.bastion_zone
-  subnet_id                   = aws_subnet.app[local.bastion_zone].id
+  subnet_id                   = aws_subnet.mgmt[local.bastion_zone].id
   vpc_security_group_ids      = [aws_security_group.mgmt.id]
   instance_type               = var.vm_instance_type
   associate_public_ip_address = true
@@ -16,11 +16,11 @@ resource "aws_instance" "bastionvm" {
   }
 
   tags = {
-    Name   = "${var.prefix}-app-${local.bastion_zone}"
+    Name   = "${var.prefix}-bastion-${local.bastion_zone}"
     prefix = var.prefix
   }
   volume_tags = {
-    Name   = "${var.prefix}-app-${local.bastion_zone}"
+    Name   = "${var.prefix}-bastion-${local.bastion_zone}"
     prefix = var.prefix
   }
 }

@@ -4,7 +4,7 @@ resource "aws_route_table" "igw" {
   ]
   vpc_id   = aws_vpc.vpc.id
   tags = {
-    Name   = "${var.prefix}-igw-${each.key}"
+    Name   = "${var.prefix}-igw"
     prefix = var.prefix
   }
 }

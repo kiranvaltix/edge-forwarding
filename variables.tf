@@ -58,3 +58,8 @@ variable "cloud_account_name" {
 variable "gw_iam_role_name" {
   description = "Valtix Gateway IAM Role Name"
 }
+
+variable "gw_image" {
+  description = "Valtix Gateway Image"
+  default     = "release-22.08-02"
+}

@@ -18,6 +18,7 @@ zones = {
 vm_instance_type = "t3a.medium"
 vm_key_name      = ""
 
-gw_iam_role_name   = ""
 cloud_account_name = ""
 valtix_api_key     = ""
+gw_iam_role_name   = ""
+gw_image           = ""

@@ -2,7 +2,7 @@ resource "aws_route_table" "igw" {
   depends_on = [
     valtix_gateway.fwd_gw
   ]
-  vpc_id   = aws_vpc.vpc.id
+  vpc_id = aws_vpc.vpc.id
   tags = {
     Name   = "${var.prefix}-igw"
     prefix = var.prefix

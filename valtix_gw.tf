@@ -26,7 +26,7 @@ resource "valtix_gateway" "fwd_gw" {
   name                    = "${var.prefix}-gw"
   csp_account_name        = var.cloud_account_name
   instance_type           = "AWS_M5_LARGE"
-  gateway_image           = "release-22.08-01"
+  gateway_image           = var.gw_image
   gateway_state           = "ACTIVE"
   mode                    = "EDGE"
   security_type           = "EGRESS"

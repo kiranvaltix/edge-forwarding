@@ -39,11 +39,20 @@ output "z_aws_console_urls" {
 
 output "z_cmds" {
   value = {
-    ingress = [for zone, dummy in var.zones :
-      "curl ${aws_instance.vm[zone].public_ip}"
-    ]
-    egress = [for zone, dummy in var.zones :
-      "ssh ubuntu@${aws_instance.vm[zone].public_ip} curl https://www.google.com -v -s -o /dev/null"
-    ]
+    ingress = { for zone, dummy in var.zones :
+      zone => [
+        "curl ${aws_instance.vm[zone].public_ip}",
+        "curl https://${aws_instance.vm[zone].public_ip}",
+        "curl --resolve www.app1.com:443:${aws_instance.vm[zone].public_ip} https://www.app1.com",
+        "curl --resolve www.app2.com:443:${aws_instance.vm[zone].public_ip} https://www.app2.com",
+        "curl --resolve www.app3.com:443:${aws_instance.vm[zone].public_ip} https://www.app3.com",
+      ]
+    }
+    egress = { for zone, dummy in var.zones :
+      zone => [
+        "ssh ubuntu@${aws_instance.vm[zone].public_ip} git clone https://github.com/valtix-security/sample-web-app.git",
+        "ssh ubuntu@${aws_instance.vm[zone].public_ip} curl https://www.google.com -s -o /dev/null -v"
+      ]
+    }
   }
 }
